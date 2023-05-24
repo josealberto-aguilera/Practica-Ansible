@@ -32,7 +32,7 @@
 ## www[001:006].example.com
 
 # Ex 3: A collection of database servers in the 'dbservers' group:
-
+  
 ## [dbservers]
 ##
 ## db01.intranet.mydomain.net
