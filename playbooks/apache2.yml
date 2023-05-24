@@ -1,6 +1,6 @@
 ---
 - name: Establecer el httpd y abrir el puerto del firewall
-  hosts: 192.168.10.61
+  hosts: 192.168.10.60
 
   tasks:
 
@@ -29,4 +29,29 @@
     service:
      name: firewalld
      state: reloaded
-   
+
+  - name: Importar archivo proxy.conf
+    template:
+     src: /etc/ansible/recursos/proxy.conf
+     dest: /etc/httpd/conf.d/proxy.conf
+     owner: root
+     group: root
+     mode: '0644'
+
+  - name: Deshabilitar módulo SELinux
+    template:
+     src: /etc/ansible/recursos/config
+     dest: /etc/selinux/config
+     owner: root
+     group: root
+     mode: '0644'
+
+  - name: Reiniciar servidor
+    reboot:
+     reboot_timeout: 30
+     post_reboot_delay: 30
+
+  - name: Iniciar httpd
+    service:
+     name: httpd
+     state: started
