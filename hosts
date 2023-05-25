@@ -9,9 +9,11 @@
 #   - A hostname/ip can be a member of multiple groups
 
 # Ex 1: Ungrouped hosts, specify before any group headers:
-
+[reverseproxy]
 192.168.10.60
+[wordpress]
 192.168.10.61
+[mariadb]
 192.168.10.62
 ## green.example.com
 ## blue.example.com
@@ -19,7 +21,10 @@
 ## 192.168.100.10
 
 # Ex 2: A collection of hosts belonging to the 'webservers' group:
-
+[updaterepos]
+192.168.10.60
+192.168.10.61
+192.168.10.62
 ## [webservers]
 ## alpha.example.org
 ## beta.example.org

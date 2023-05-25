@@ -1,0 +1,13 @@
+---
+- name: Copiar backup al servidor MariaDB  
+  copy:            
+          src: /etc/ansible/recursos/backups/backup_bdwordpress_2023-05-22_09:04:20.sql       
+          dest: /home/
+
+- name: Restaurar backup de la base de datos
+  mysql_db:  
+          name: bdwordpress           
+          state: import                           
+          target: /home/backup_bdwordpress_2023-05-22_09:04:20.sql
+          login_user: wpuser                                                    
+          login_password: 1234

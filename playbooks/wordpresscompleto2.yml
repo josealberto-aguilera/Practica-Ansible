@@ -1,0 +1,23 @@
+---
+- name: Actualizar repositorios
+  hosts: updaterepos
+  roles:
+          - updatereps
+
+- name: Instalar apache y configurar proxy inverso
+  hosts: reverseproxy
+  roles:
+          - apacheinstall
+          - reverseproxy
+
+- name: Instalar y configurar wordpress
+  hosts: wordpress
+  roles:
+          - apacheinstall
+          - wordpressinstall
+
+- name: Instalar, crear bd y usuario en mariadb
+  hosts: mariadb
+  roles:
+          - mariadbinstall
+          - mariadbrecovery

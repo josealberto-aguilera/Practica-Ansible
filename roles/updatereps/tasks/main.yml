@@ -1,0 +1,5 @@
+---
+- name: Actualizar paquetes
+  package:
+          name: '*'
+          state: latest

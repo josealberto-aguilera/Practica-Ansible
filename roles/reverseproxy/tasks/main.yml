@@ -1,0 +1,27 @@
+---
+- name: Importar archivo proxy.conf
+  template:  
+          src: /etc/ansible/recursos/proxy.conf               
+          dest: /etc/httpd/conf.d/proxy.conf                                 
+          owner: root
+          group: root
+          mode: '0644'
+
+- name: Deshabilitar módulo SELinux  
+  template:
+          src: /etc/ansible/recursos/config  
+          dest: /etc/selinux/config                                 
+          owner: root                                     
+          group: root                       
+          mode: '0644'
+
+- name: Reiniciar servidor
+  reboot:                     
+          reboot_timeout: 60           
+          post_reboot_delay: 30
+
+- name: Iniciar httpd
+  service:          
+          name: httpd            
+          state: started
+
