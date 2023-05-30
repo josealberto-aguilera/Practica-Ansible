@@ -1,34 +1,60 @@
 ---
+
+# Habilitar repositorios (sólo en CentOS)
+
 - name: Importar clave para repositorio remi-release
   rpm_key:
           key: https://rpms.remirepo.net/RPM-GPG-KEY-remi2018            
           state: present
+  when: ansible_distribution == 'CentOS'
 
 - name: Habilitar repositorios
   yum:          
           name: https://rpms.remirepo.net/enterprise/remi-release-8.rpm, https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm        
           state: present
+  when: ansible_distribution == 'CentOS'
 
-- name: Instalar paquetes requeridos
+# Instalar php
+
+- name: Instalar paquetes requeridos en CentOS
   yum:          
           name: "{{ item }}"        
           state: latest
                               
   loop:
-          - php           
-          - httpd                 
+          - php                            
           - php-gd                   
           - php-xml                    
           - php-mbstring                     
           - php-mysqli
+  when: ansible_distribution == 'CentOS'
+
+- name: Instalar paquetes requeridos en Debian
+  apt:
+          name: "{{ item }}"
+          state: present
+
+  loop:
+          - php
+          - php-gd
+          - php-xml
+          - php-mbstring
+          - php-mysql
+  when: ansible_distribution == 'Debian'
+
+# Actualizar php (sólo en CentOS)
 
 - name: Resetear modulo php
   shell: dnf module reset php -y
-  
+  when: ansible_distribution == 'CentOS'
+
 - name: Instalar php 8
   shell: dnf module install php:remi-8.0 -y
+  when: ansible_distribution == 'CentOS'
 
-- name: Copiar ficheros de WordPress  
+# Instalación y configuración de Wordpress
+
+- name: Copiar ficheros de WordPress en CentOS
   unarchive:            
           src: https://wordpress.org/latest.tar.gz            
           dest: /var/www/html/                                
@@ -36,14 +62,39 @@
           owner: apache                         
           group: apache                       
           mode: '0755'
+  when: ansible_distribution == 'CentOS'
 
-- name: Establecer configuración de Wordpress
+- name: Copiar ficheros de WordPress en Debian
+  unarchive:
+          src: https://wordpress.org/latest.tar.gz
+          dest: /var/www/html/
+          remote_src: yes
+          owner: www-data
+          group: www-data
+          mode: '0755'
+  when: ansible_distribution == 'Debian'
+
+
+
+- name: Establecer configuración de Wordpress en CentOS
   template:  
           src: /etc/ansible/recursos/wp-config.php           
           dest: /var/www/html/wordpress/wp-config.php                                
           owner: apache                                          
           group: apache                       
           mode: '0644'
+  when: ansible_distribution == 'CentOS'
+
+- name: Establecer configuración de WordPress en Debian
+  template:          
+          src: /etc/ansible/recursos/wp-config.php           
+          dest: /var/www/html/wordpress/wp-config.php
+          owner: www-data                                      
+          group: www-data                       
+          mode: '0644'   
+  when: ansible_distribution == 'Debian'
+
+# Deshabilitar módulo de seguridad SELinux (sólo en CentOS)
 
 - name: Deshabilitar módulo SELinux
   template: 
@@ -52,13 +103,25 @@
           owner: root                                  
           group: root                     
           mode: '0644'
+  when: ansible_distribution == 'CentOS'
 
 - name: Reiniciar servidor
   reboot:  
           reboot_timeout: 60         
           post_reboot_delay: 30
+  when: ansible_distribution == 'CentOS'
 
-- name: Iniciar httpd
+# Iniciar apache
+
+- name: Iniciar httpd en CentOS
   service:
           name: httpd
           state: started
+  when: ansible_distribution == 'CentOS'
+
+- name: Reiniciar httpd en Debian
+  service:
+          name: apache2
+          state: restarted
+  when: ansible_distribution == 'Debian'
+

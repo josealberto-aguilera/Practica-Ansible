@@ -1,7 +1,10 @@
 ---
-- name: Instalar MariaDB
+
+# Instalar MariaDB
+
+- name: Instalar MariaDB en CentOS
   yum:
-          name:      
+          name:
                   - mariadb-server               
                   - python2                                  
                   - python3                           
@@ -9,22 +12,38 @@
                   - python3-mysql                                   
                   - python2-PyMySQL                                 
           state: latest
+  when: ansible_distribution == 'CentOS'
 
-                                  
+- name: Instalar MariaDB en Debian
+  apt:
+          name:
+                  - ufw
+                  - mariadb-server
+                  - python3
+                  - python3-mysqldb
+          state: latest
+  when: ansible_distribution == 'Debian'
+
+# Iniciar MariaDB (común)
+
 - name: Iniciar MariaDB
   service:         
           name: mariadb          
           enabled: true                       
           state: started
-                       
-- name: Crear base de datos para WordPress
-  mysql_db:        
-        name: bdwordpress                   
-        login_user: root                         
-        login_host: localhost                        
-        state: present
-                             
-- name: Crear usuario para la base de datos
+
+# Crear base de datos para WordPress (común)
+
+- name: Crear base de datos para WordPress en CentOS
+  mysql_db:
+          name: bdwordpress                   
+          login_user: root
+          login_host: localhost                        
+          state: present
+
+# Crear usuario para la bd (común)
+
+- name: Crear usuario para la base de datos en CentOS
   mysql_user:                                           
           name: wpuser             
           password: 1234                      
@@ -32,19 +51,66 @@
           host: '%'                                         
           state: present
 
-- name: Habilitar el servicio mysql en firewalld  
+# Habilitar servicio mysql
+
+- name: Habilitar el servicio mysql en firewalld en CentOS
   firewalld:            
           service: mysql            
           permanent: true                        
           state: enabled
+  when: ansible_distribution == 'CentOS'
 
-- name: Abrir el puerto 3306 en firewalld
+- name: Habilitar el servicio mysql en ufw en Debian
+  ufw:
+          rule: allow
+          port: 3306
+          proto: tcp
+          state: enabled
+  when: ansible_distribution == 'Debian'
+
+# Abrir puertos (sólo en CentOS)
+
+- name: Abrir el puerto 3306 en firewalld en CentOS
   firewalld:
           port: 3306/tcp            
           permanent: true                        
           state: enabled
+  when: ansible_distribution == 'CentOS'
 
-- name: Recargar la configuración del firewall
+- name: Abrir el puerto 22 en ufw en Debian
+  ufw:
+          rule: allow
+          port: 22
+          proto: tcp
+          state: enabled
+  when: ansible_distribution == 'Debian'
+
+# Importar archivo de configuración para el bind-address (sólo en Debian)
+
+- name: Importar archivo 50-server.cnf
+  template:
+          src: /etc/ansible/recursos/50-server.cnf
+          dest: /etc/mysql/mariadb.conf.d/50-server.cnf
+          owner: root
+          group: root
+          mode: '0644'
+  when: ansible_distribution == 'Debian'
+
+- name: Recargar mariadb
+  service:
+          name: mariadb
+          state: restarted
+  when: ansible_distribution == 'Debian'
+# Recargar firewall
+
+- name: Recargar la configuración del firewall en CentOS
   systemd:  
           name: firewalld          
           state: restarted
+  when: ansible_distribution == 'CentOS'
+
+- name: Recargar la configuración del firewall en Debian
+  systemd:
+          name: ufw
+          state: restarted
+  when: ansible_distribution == 'Debian'

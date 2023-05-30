@@ -1,4 +1,4 @@
 Para cambiar el backup que se quiere restaurar,
 se debe cambiar el nombre del backup en las líneas
-4 y 11 del archivo mariadbrecovery/tasks/main.yml
+7, 13, 23 y 32 del archivo mariadbrecovery/tasks/main.yml
 

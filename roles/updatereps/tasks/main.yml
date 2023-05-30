@@ -1,5 +1,13 @@
 ---
-- name: Actualizar paquetes
+- name: Actualizar paquetes en CentOS
   package:
           name: '*'
           state: latest
+  when: ansible_distribution == 'CentOS'
+
+- name: Actualizar paquetes en Debian
+  apt:
+          name: '*'
+          state: latest
+          update_cache: yes
+  when: ansible_distribution == 'Debian'

@@ -1,28 +1,41 @@
 ---
+
+# Crear directorio para el backup
+
 - name: Crear directorio de copia de seguridad            
   file:                                
           path: "{{ backup_dir }}"       
           state: directory                                  
           mode: '0755'
                       
-- name: Crear copia de seguridad
+# Crear backup
+
+- name: Crear copia de seguridad en CentOS
   mysql_db:                                
           name: "{{ database_name }}"           
           state: dump                                     
-          target: "{{ backup_file }}"
-          
-- name: Verificar si el backup se realizó correctamente
-  command: "ls {{ backup_file }}"                                                       
-  register: backup_check                                 
-  failed_when: backup_check.rc != 0
+          target: "{{ centos_backup_file }}"
+  when: ansible_distribution == 'CentOS'
 
-- name: Mostrar mensaje de éxito
-  debug:                                
-          msg: "Backup realizada con éxito en {{ backup_file }}"        
-          when: backup_check.rc == 0
+- name: Crear copia de seguridad en Debian
+  mysql_db:
+          name: "{{ database_name }}"
+          state: dump                     
+          target: "{{ debian_backup_file }}"
+  when: ansible_distribution == 'Debian'
           
-- name: Copiar backup al nodo de control
+# Copiar backup al control node
+
+- name: Copiar backup al nodo de control en CentOS
   fetch:
-          src: "{{ backup_file }}"        
+          src: "{{ centos_backup_file }}"        
           dest: "/etc/ansible/recursos/backups/"                                  
           flat: yes
+  when: ansible_distribution == 'CentOS'
+
+- name: Copiar backup al nodo de control en Debian
+  fetch:
+          src: "{{ debian_backup_file }}"
+          dest: "/etc/ansible/recursos/backups/"
+          flat: yes
+  when: ansible_distribution == 'Debian'

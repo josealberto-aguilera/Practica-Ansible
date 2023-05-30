@@ -1,0 +1,16 @@
+---
+
+#- name: Actualizar repositorios
+  #  hosts: mariadb
+  #  roles:
+          #          - updatereps
+
+            #- name: Instalar apache y configurar proxy inverso
+            #  hosts: reverseproxy
+            #  roles:
+            #          - apacheinstall
+            #          - reverseproxy
+- name: Instalar mariadb
+  hosts: mariadb
+  roles:
+          - mariadbrecovery

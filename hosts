@@ -11,20 +11,25 @@
 # Ex 1: Ungrouped hosts, specify before any group headers:
 [reverseproxy]
 192.168.10.60
+192.168.10.70
+
 [wordpress]
 192.168.10.61
+192.168.10.71
+
 [mariadb]
 192.168.10.62
-## green.example.com
-## blue.example.com
-## 192.168.100.1
-## 192.168.100.10
+192.168.10.72
+
+[updaterepos]
+client1 ansible_host=192.168.10.60
+client2 ansible_host=192.168.10.61
+client3 ansible_host=192.168.10.62
+debianclient1 ansible_host=192.168.10.70
+debianclient2 ansible_host=192.168.10.71
+debianclient3 ansible_host=192.168.10.72
 
 # Ex 2: A collection of hosts belonging to the 'webservers' group:
-[updaterepos]
-192.168.10.60
-192.168.10.61
-192.168.10.62
 ## [webservers]
 ## alpha.example.org
 ## beta.example.org

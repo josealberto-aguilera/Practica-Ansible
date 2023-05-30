@@ -1,4 +1,18 @@
 ---
+# Habilitar módulos proxy y proxy_http (sólo en Debian)
+
+- name: Habilitar módulo proxy
+  command: a2enmod proxy
+  become: true
+  when: ansible_distribution == 'Debian'
+
+- name: Habilitar módulo proxy_http
+  command: a2enmod proxy_http
+  become: true
+  when: ansible_distribution == 'Debian'
+
+# Importar archivo de configuración del proxy
+
 - name: Importar archivo proxy.conf
   template:  
           src: /etc/ansible/recursos/proxy.conf               
@@ -6,6 +20,25 @@
           owner: root
           group: root
           mode: '0644'
+  when: ansible_distribution == 'CentOS'
+
+- name: Importar archivo apache2proxy.conf
+  template:
+          src: /etc/ansible/recursos/apache2proxy.conf
+          dest: /etc/apache2/sites-available/apache2proxy.conf
+          owner: www-data
+          group: www-data
+          mode: '0644'
+  when: ansible_distribution == 'Debian'
+
+# Habilitar sitio apache2proxy.conf (sólo en Debian)
+
+- name: Habilitar apache2proxy.conf
+  command: a2ensite apache2proxy.conf
+  become: true
+  when: ansible_distribution == 'Debian'
+
+# Deshabilitar módulo SELinux (sólo en CentOS)
 
 - name: Deshabilitar módulo SELinux  
   template:
@@ -14,14 +47,24 @@
           owner: root                                     
           group: root                       
           mode: '0644'
+  when: ansible_distribution == 'CentOS'
 
 - name: Reiniciar servidor
   reboot:                     
           reboot_timeout: 60           
           post_reboot_delay: 30
+  when: ansible_distribution == 'CentOS'
+
+# Iniciar httpd
 
 - name: Iniciar httpd
   service:          
           name: httpd            
           state: started
+  when: ansible_distribution == 'CentOS'
 
+- name: Iniciar apache2
+  service:
+          name: apache2
+          state: restarted
+  when: ansible_distribution == 'Debian'

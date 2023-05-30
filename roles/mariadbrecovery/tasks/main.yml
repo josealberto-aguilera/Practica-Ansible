@@ -1,13 +1,35 @@
 ---
-- name: Copiar backup al servidor MariaDB  
-  copy:            
-          src: /etc/ansible/recursos/backups/backup_bdwordpress_2023-05-22_09:04:20.sql       
-          dest: /home/
 
-- name: Restaurar backup de la base de datos
+# Copiar backup al servidor MariaDB
+
+- name: Copiar backup al servidor MariaDB en CentOS
+  copy:            
+          src: /etc/ansible/recursos/backups/backup_CentOSbdwordpress_2023-05-30_08:49:08.sql       
+          dest: /home/
+  when: ansible_distribution == 'CentOS'
+
+- name: Copiar backup al servidor MariaDB en CentOS
+  copy:
+          src: /etc/ansible/recursos/backups/backup_Debianbdwordpress_2023-05-30_08:49:08.sql
+          dest: /home/
+  when: ansible_distribution == 'Debian'
+
+# Restaurar backup
+
+- name: Restaurar backup de la base de datos en CentOS
   mysql_db:  
           name: bdwordpress           
           state: import                           
-          target: /home/backup_bdwordpress_2023-05-22_09:04:20.sql
+          target: /home/backup_CentOSbdwordpress_2023-05-30_08:49:08.sql
           login_user: wpuser                                                    
           login_password: 1234
+  when: ansible_distribution == 'CentOS'
+
+- name: Restaurar backup de la base de datos en Debian
+  mysql_db:
+          name: bdwordpress
+          state: import
+          target: /home/backup_Debianbdwordpress_2023-05-30_08:49:08.sql
+          login_user: wpuser
+          login_password: 1234
+  when: ansible_distribution == 'Debian'

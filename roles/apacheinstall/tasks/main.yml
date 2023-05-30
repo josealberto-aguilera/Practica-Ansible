@@ -1,26 +1,79 @@
 ---
-- name: Instalar paquete apache
+
+# Instalar paquete apache
+
+- name: Instalar paquete apache en CentOS
   yum:
           name: httpd   
           state: present
+  when: ansible_distribution == 'CentOS'
 
-- name: Iniciar httpd
+- name: Instalar paquete apache en Debian
+  apt:
+          name: apache2
+          state: present
+  when: ansible_distribution == 'Debian'
+
+# Iniciar apache
+
+- name: Iniciar httpd en CentOS
   service:         
           name: httpd          
           state: started
+  when: ansible_distribution == 'CentOS'
 
-- name: Abrir puerto para servicio http
+- name: Iniciar httpd en Debian
+  service:
+          name: apache2
+          state: started
+  when: ansible_distribution == 'Debian'
+
+# Abrir puerto para apache
+
+- name: Abrir puerto para servicio http en CentOS
   firewalld:          
           service: http            
           permanent: true                       
           state: enabled
+  when: ansible_distribution == 'CentOS'
 
-- name: Reiniciar servicio firewalld y cargar los cambios del firewall
+- name: Instalar ufw
+  apt:
+          name: ufw
+          state: present
+  when: ansible_distribution == 'Debian'
+
+- name: Abrir puerto para servicio http en Debian
+  ufw:
+          rule: allow
+          port: 80
+          proto: tcp
+  when: ansible_distribution == 'Debian'
+
+# Reiniciar servicio de firewall y cargar los cambios
+
+- name: Reiniciar servicio firewalld y cargar los cambios del firewall en CentOS
   service:          
           name: firewalld          
           state: reloaded
+  when: ansible_distribution == 'CentOS'
 
-- name: Reiniciar httpd
+- name: Reiniciar servicio firewalld y cargar los cambios del firewall en Debian
+  service:
+          name: nftables
+          state: reloaded
+  when: ansible_distribution == 'Debian'
+
+# Reiniciar apache
+
+- name: Reiniciar httpd en CentOS
   service:          
           name: httpd         
           state: restarted
+  when: ansible_distribution == 'CentOS'
+
+- name: Reiniciar httpd en Debian
+  service:
+          name: apache2
+          state: restarted
+  when: ansible_distribution == 'Debian'

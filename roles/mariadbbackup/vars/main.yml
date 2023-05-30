@@ -2,4 +2,5 @@
 # vars file for mariadbbackup
 backup_dir: /home
 database_name: bdwordpress
-backup_file: "{{ backup_dir }}/backup_{{ database_name }}_{{ ansible_date_time.date }}_{{ ansible_date_time.time }}.sql"
+centos_backup_file: "{{ backup_dir }}/backup_CentOS{{ database_name }}_{{ ansible_date_time.date }}_{{ ansible_date_time.time }}.sql"
+debian_backup_file: "{{ backup_dir }}/backup_Debian{{ database_name }}_{{ ansible_date_time.date }}_{{ ansible_date_time.time }}.sql"
